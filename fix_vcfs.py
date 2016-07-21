@@ -3,7 +3,7 @@ f = open(sys.argv[1], 'r')
 allowed_alleles = set(["A","C","T","G","N"])
 for line in f:
 	if line.startswith("#"):
-		print line
+		print line.strip()
 		continue
 	split = line.split("\t")
 	if split[3].strip() not in allowed_alleles:
