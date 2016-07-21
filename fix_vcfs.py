@@ -10,4 +10,4 @@ for line in f:
 		continue
 	if split[4].strip() == ".":
 		split[4] = "N"
-	print "\t".join(split)
+	print "\t".join(split).strip()
