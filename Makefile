@@ -8,15 +8,19 @@ DUPLICATES=../intermediate_data/qc_ceu_plus_auto_filt.dupvar
 GENOTYPES=$(addprefix $(BASENAME_GENOTYPES), $(BEDBIMFAM))
 BASENAME_SPLIT_GENOTYPES = ../intermediate_data/adm ../intermediate_data/ceu ../intermediate_data/inuit
 BASENAME_SPLIT_GENOTYPES_BIMBAMFAM = $(foreach type, $(BASENAME_SPLIT_GENOTYPES), $(addprefix $(type), $(BEDBIMFAM))) #3*3 of ceu ADM inuit * bed bim fam
-VCFs = $(addprefix ../intermediate_data/beagle_in_, adm.vcf ceu.vcf inuit.vcf)
+VCFs = adm.vcf ceu.vcf inuit.vcf
 
 .PHONY: all
-all: $(VCFs)
+all: $(addprefix ../intermediate_data/beagle_in_fixed_, $(VCFs))
+
+## edit VCFs to make Beagle happy
+$(addprefix ../intermediate_data/beagle_in_fixed_, $(VCFs)) : $(addprefix ../intermediate_data/beagle_in_, $(VCFs))
+	python fix_vcfs.py $(subst fixed_,,$@) > $@
 
 ## recode to VCFs so that beagle is happy
-$(VCFs) : $(BASENAME_SPLIT_GENOTYPES_BIMBAMFAM)
+$(addprefix ../intermediate_data/beagle_in_, $(VCFs)) : $(BASENAME_SPLIT_GENOTYPES_BIMBAMFAM)
 	plink --bfile $(subst beagle_in_,,$(basename $@))\
-		  --recode vcf --keep-allele-order\
+		  --recode vcf-iid --keep-allele-order\
 		  --out $(basename $@)
 
 ## Split genotypes into CEU, admixed, Inuit
