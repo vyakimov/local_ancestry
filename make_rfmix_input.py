@@ -9,7 +9,6 @@ chrs = range(1, 23)
 
 # make sure cols 0,1,2 are identical between adm,inuit,ceu
 for chr in chrs:
-    chr = 11
     print chr
     phased_vcf_path_adm = "../intermediate_data/phased/{}_chr{}.vcf.gz".format("adm", chr)
     phased_vcf_path_inuit = "../intermediate_data/phased/{}_chr{}.vcf.gz".format("inuit", chr)
