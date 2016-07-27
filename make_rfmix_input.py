@@ -2,13 +2,14 @@ import pandas as pd
 from numpy import interp
 import os
 
-# os.chdir("/projects/ingo/local_ancestry/viya_tmp/scripts/")
-os.chdir("/Volumes/Greenland/local_ancestry/viya_tmp/scripts/")
+os.chdir("/projects/ingo/local_ancestry/viya_tmp/scripts/")
+# os.chdir("/Volumes/Greenland/local_ancestry/viya_tmp/scripts/")
 chrs = range(1, 23)
 
 
 # make sure cols 0,1,2 are identical between adm,inuit,ceu
 for chr in chrs:
+    chr = 11
     print chr
     phased_vcf_path_adm = "../intermediate_data/phased/{}_chr{}.vcf.gz".format("adm", chr)
     phased_vcf_path_inuit = "../intermediate_data/phased/{}_chr{}.vcf.gz".format("inuit", chr)
@@ -36,17 +37,16 @@ for chr in chrs:
     f = open("../intermediate_data/rfmix_in/alleles_chr{}.txt".format(chr), 'w')
     for r in catted.iterrows():
         f.write("".join(r[1]).replace("|", "") + "\n")
-    #    break
     f.close()
 
     genetic_map = pd.read_table(genetic_map_path)
     bim = pd.read_table("../intermediate_data/adm.bim", header=None)
     bim = bim[bim[0] == chr]
     # we have already checked to see that all the rsIDs are identical
-    non_filtered_snps = bim[1].isin(phased_vcf_adm[2])
-    bim_bool = bim[non_filtered_snps]
+    bim = bim[bim[1].isin(phased_vcf_adm[2])]
+
     # make sure RSIDs are in the correct order
-    assert(sum(bim_bool[1] != phased_vcf_adm[2]) == 0)  # crashhhhhh
+    assert(sum(bim[1] != phased_vcf_adm[2]) == 0)
     genetic_dist = interp(bim[3], genetic_map["Position(bp)"], genetic_map["Map(cM)"])
     genetic_dist = ["%.15f" % x for x in genetic_dist]
     f = open("../intermediate_data/rfmix_in/snp_locations_chr{}.txt".format(chr), 'w')
@@ -54,6 +54,7 @@ for chr in chrs:
     f.close()
 
 
+#######################
 f = open("../intermediate_data/rfmix_in/classes.txt".format(chr), 'w')
 classes = '0' * (adm_alleles.shape[1] * 2) + \
     '1' * (inuit_alleles.shape[1] * 2) + \
