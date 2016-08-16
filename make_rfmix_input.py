@@ -55,8 +55,8 @@ for chr in chrs:
 
 #######################
 f = open("../intermediate_data/rfmix_in/classes.txt".format(chr), 'w')
-classes = '0' * (adm_alleles.shape[1] * 2) + \
-    '1' * (inuit_alleles.shape[1] * 2) + \
-    '2' * (ceu_alleles.shape[1] * 2)
-f.write(classes)
+classes = '0 ' * (adm_alleles.shape[1] * 2) + \
+    '1 ' * (inuit_alleles.shape[1] * 2) + \
+    '2 ' * (ceu_alleles.shape[1] * 2)
+f.write(classes.strip())
 f.close()
