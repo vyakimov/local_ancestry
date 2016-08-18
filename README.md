@@ -13,3 +13,7 @@
 * `phase.sh` will run Beagle 
 * `make_rfmix_input.py` will create the necessary files for RFMix by taking Beagle output 
 * `run_rfmix.sh` will run RFMix 
+* `plot_local_ancestry.py` will take RFMix output and generate local ancestry plots 
+
+
+(Note, RFMix was partly run on the computerome. The same parameters were used as run_rfmix.sh)
