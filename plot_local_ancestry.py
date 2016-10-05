@@ -1,12 +1,14 @@
 import sys
 import pandas as pd
 import numpy as np
+import matplotlib as mpl; mpl.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import linecache
+
 ind_number = int(sys.argv[1])
-ingo_ID = linecache.getline("../intermediate_data/adm.fam",ind_number).strip().split()[0]
+ingo_ID = linecache.getline("../intermediate_data/adm.fam", ind_number).strip().split()[0]
 # make blank plot
 # 1388 people in total
 data_path = "../intermediate_data/"
@@ -77,7 +79,6 @@ legend_undef = patches.Patch(color="#C6AFB1", label="Undetermined")
 plt.legend(handles=[legend_inuit, legend_ceu, legend_undef], loc="lower right")
 
 
-
 # paint a single chromosome
 def paint_chromosome(chromosome, hap, ancestry_begin_end):
     "we assume the whole thing is inuit, and plot CEU and undetermined on top"
@@ -129,12 +130,11 @@ def paint_chromosome(chromosome, hap, ancestry_begin_end):
 
 # extract painting coordinates
 # 1 = inuit, #2 = ceu
-inuit_threshold = 0.8
-ceu_threshold = 0.2
+inuit_threshold = 0.1
+ceu_threshold = 0.9
 
 a_person = pd.DataFrame(index=np.arange(51372), columns=[
     "haplo1_inuit", "haplo1_ceu", "haplo2_inuit", "haplo2_ceu"])
-
 
 
 def lazy(file):
@@ -164,42 +164,42 @@ for chromosome in chromosomes:
     for i in generator:
         line = map(float, i.split()[(ind_number * 4 - 4): ind_number * 4])
 
-        if (line[1] > inuit_threshold) & (flag1 is not "inuit"):
+        if (line[1] < inuit_threshold) & (flag1 is not "inuit"):
             # print "hap1 {}, getting inuit (was {})".format(index, flag1)
             if flag1 is not "empty":
                 inuit_index_hap1.append((flag1, (start_hap_1, index)))
             start_hap_1 = index
             flag1 = "inuit"
 
-        if (line[1] <= ceu_threshold) & (flag1 is not "ceu"):
+        if (line[1] >= ceu_threshold) & (flag1 is not "ceu"):
             # print "hap1 {}, getting ceu (was {})".format(index, flag1)
             if flag1 is not "empty":
                 inuit_index_hap1.append((flag1, (start_hap_1, index)))
             start_hap_1 = index
             flag1 = "ceu"
 
-        if ((line[1] >= ceu_threshold) & (line[1] < inuit_threshold) & (flag1 is not "bad")):
+        if ((line[1] <= ceu_threshold) & (line[1] > inuit_threshold) & (flag1 is not "bad")):
             # print "hap1 {}, getting bad :( (was {})".format(index, flag1)
             if flag1 is not "empty":
                 inuit_index_hap1.append((flag1, (start_hap_1, index)))
             start_hap_1 = index
             flag1 = "bad"
 
-        if (line[3] > inuit_threshold) & (flag2 is not "inuit"):
+        if (line[3] < inuit_threshold) & (flag2 is not "inuit"):
             # print "hap2 {}, getting inuit :) (was {})".format(index, flag2)
             if flag2 is not "empty":
                 inuit_index_hap2.append((flag2, (start_hap_2, index)))
             start_hap_2 = index
             flag2 = "inuit"
 
-        if (line[3] <= ceu_threshold) & (flag2 is not "ceu"):
+        if (line[3] >= ceu_threshold) & (flag2 is not "ceu"):
             # print "hap2 {}, getting ceu (was {})".format(index, flag2)
             if flag2 is not "empty":
                 inuit_index_hap2.append((flag2, (start_hap_2, index)))
             start_hap_2 = index
             flag2 = "ceu"
 
-        if ((line[3] >= ceu_threshold) & (line[3] < inuit_threshold) & (flag2 is not "bad")):
+        if ((line[3] <= ceu_threshold) & (line[3] > inuit_threshold) & (flag2 is not "bad")):
             # print "hap2 {}, getting bad :( (was {})".format(index, flag2)
             if flag2 is not "empty":
                 inuit_index_hap2.append((flag2, (start_hap_2, index)))
@@ -213,6 +213,7 @@ for chromosome in chromosomes:
 
     # print inuit_index_hap1
     # print inuit_index_hap2
+
     paint_chromosome(chromosome, -1, inuit_index_hap1)
     paint_chromosome(chromosome, 1, inuit_index_hap2)
 
