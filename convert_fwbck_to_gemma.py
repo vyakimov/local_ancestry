@@ -1,6 +1,6 @@
 from __future__ import print_function
-from numpy import mean, repeat
-
+from numpy import mean, repeat, interp
+import pandas as pd
 # Here we take RFMix output, compress all the windows, and output one ancestry per window
 
 chromosomes = range(1, 23)
@@ -21,13 +21,16 @@ for chromosome in chromosomes:
     snpfile = open("{}gemma_in/chr{}_ancestry.snps".format(data_path, chromosome), 'w')
     genofile = open("{}gemma_in/chr{}_ancestry".format(data_path, chromosome), 'w')
     fwdbck = "{}rfmix_out/chr{}.3.ForwardBackward.txt".format(data_path, chromosome)
+#    snpLocs = pd.read_table("{}rfmix_in/snp_locations_chr{}.txt".format(data_path, chromosome), header=None)
 #    brks = "{}/rfmix_out/chr{}_breaks.txt".format(data_path, chromosome)
-    snpPos = 0
+#    chb = pd.read_table("{}../raw_data/CHB/CHB-{}-final.txt.gz".format(data_path, chromosome))
+    # snpLocsBP = interp(snpLocs, chb["Map(cM)"], chb["Position(bp)"]).flatten().astype(int)
+    index = 0
     previous_line = -1.0
     breaks = []
     with open(fwdbck, 'r') as f:
         for line in f:
-            snpPos = snpPos + 1
+            index = index + 1
             spltline = line.strip().split(" ")
             # each element is a column, each fourth element is a new person
 
@@ -35,7 +38,7 @@ for chromosome in chromosomes:
             if (summed_line == previous_line):
                 continue
             else:
-                breaks.append(snpPos)
+                breaks.append(index)
                 ancestry_vector = [int(round(float(x))) for x in spltline]
                 # since ancestry1 + ancestry2 == 1, we can throw out every second column
                 ancestry_vector = ancestry_vector[::2]
@@ -44,11 +47,13 @@ for chromosome in chromosomes:
                 # 2 is inuit, 1 is CEU
                 mean_ancestry += repeat("2.0", inuit_count)
                 ancestry_vector = ",".join(mean_ancestry)
-                print("c{}p{},T,G,{}".format(chromosome, snpPos, ancestry_vector), file=genofile)
-                print("c{}p{},{},{}".format(chromosome, snpPos, snpPos, chromosome), file=snpfile)
+                print("c{}p{},T,G,{}".format(chromosome, index, ancestry_vector), file=genofile)
+                print("c{}p{},{},{}".format(chromosome, index,
+                                            index, chromosome), file=snpfile)
+                previous_line=summed_line
 
-                previous_line = summed_line
 
     breaks = [str(x) for x in breaks]
 snpfile.close()
 genofile.close()
+
