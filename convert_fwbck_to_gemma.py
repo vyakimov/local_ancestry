@@ -1,5 +1,5 @@
 from __future__ import print_function
-from numpy import mean, repeat, interp
+from numpy import mean, repeat
 import pandas as pd
 # Here we take RFMix output, compress all the windows, and output one
 # ancestry per window
@@ -27,7 +27,7 @@ for chromosome in chromosomes:
     fwdbck = "{}rfmix_out/chr{}.3.ForwardBackward.txt".format(
         data_path, chromosome)
     snp_pos_series = pd.read_table("{}phased/inuit_chr{}.vcf.gz".format(data_path, chromosome),
-                                   header=None, comment="#", usecols=[1])[1]
+                                   header=None, comment="#", usecols=[1])[1]  # physical position of all snps
 
 #    snpLocs = pd.read_table("{}rfmix_in/snp_locations_chr{}.txt".format(
 #                            data_path, chromosome), header=None)
@@ -36,34 +36,34 @@ for chromosome in chromosomes:
 #                         data_path, chromosome))
 #     snpLocsBP = interp(snpLocs, chb["Map(cM)"],
 #                        chb["Position(bp)"]).flatten().astype(int)
-    index = 0
+
+    index = 0  # line in file
     previous_line = -1.0
     breaks = []
     with open(fwdbck, 'r') as f:
         for line in f:
-            snp_pos = snp_pos_series[index]
+            snp_pos = snp_pos_series[index]  # physical snp position;
             index = index + 1
             spltline = line.strip().split(" ")
             # each element is a column, each fourth element is a new person
 
             summed_line = sum([float(x) for x in spltline])
-            if (summed_line == previous_line):
+            if (summed_line == previous_line):  # we are still in the same rf_mix window
                 continue
             else:
                 breaks.append(index)
                 ancestry_vector = [int(round(float(x))) for x in spltline]
-                # since ancestry1 + ancestry2 == 1, we can throw out every
-                # second column
+                # since ancestry1 + ancestry2 == 1, we can throw out every second column
                 ancestry_vector = ancestry_vector[::2]
-                # take mean of hap1 and hap2
+                # take mean of the two haplotypes
                 mean_ancestry = [
                     str(mean(x) + 1) for x in zip(ancestry_vector[::2], ancestry_vector[1::2])]
                 # 2 is inuit, 1 is CEU
                 mean_ancestry += repeat("2.0", inuit_count)
                 ancestry_vector = ",".join(mean_ancestry)
                 print("c{}p{},T,G,{}".format(chromosome,
-                                             snp_pos, ancestry_vector), file=genofile)
-                print("c{}p{},{},{}".format(chromosome, snp_pos,
+                                             index, ancestry_vector), file=genofile)
+                print("c{}p{},{},{}".format(chromosome, index,
                                             snp_pos, chromosome), file=snpfile)
                 previous_line = summed_line
 
