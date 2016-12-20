@@ -4,7 +4,7 @@ cat adm_id_list.txt inuit_id_list.txt > adm_inuit_id_list.txt
 # plink --bfile ../raw_data/qc_ceu_plus_auto_filt --keep adm_inuit_id_list.txt --chr 1-10,12-22 --make-bed --out plink_out/set1
 
 ## filter on admixed and pure inuit individuals 
-plink --bfile ../raw_data/qc_ceu_plus_auto_filt --keep adm_inuit_id_list.txt --make-bed --out plink_out/set1
+plink --bfile ../raw_data/qc_ceu_plus_auto_filt --keep adm_inuit_id_list.txt --indiv-sort f adm_inuit_id_list.txt --make-bed --out plink_out/set1
 plink --bfile plink_out/set1 --maf 0.05 --geno 0.01 --make-bed --out plink_out/set2
 ## remove duplicates
 plink --bfile plink_out/set2 --list-duplicate-vars --out plink_out/dupvars
