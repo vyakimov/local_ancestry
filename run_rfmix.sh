@@ -13,7 +13,3 @@ do
 	python RunRFMix.py ${OPTS} ${ALLELES} ${CLASSES} ${LOCS} -o ${OUT}
 done
 
-# python ../../painting_haplotypes/RFMix_v1.5.4/RunRFMix.py --forward-backward -e 3 PopPhased ../intermediate_data/rfmix_in/alleles_chr11.txt ../intermediate_data/rfmix_in/classes.txt ../intermediate_data/rfmix_in/snp_locations_chr11.txt -o ../intermediate_data/rfmix_out/chr1
-
-## works: 
-#python RunRFMix.py --forward-backward -e 3 PopPhased ../../painting_haplotypes/RFmix_in/alleles_chr_11.txt ../../painting_haplotypes/RFmix_in/classes.txt ../../painting_haplotypes/RFmix_in/snp_locations_adm.bim -o ../intermediate_data/rfmix_out/chr1
