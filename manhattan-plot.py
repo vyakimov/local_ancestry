@@ -1,14 +1,11 @@
-"""
-    %prog [options] files
-
-plot a manhattan plot of the input file(s).
-"""
-
+import matplotlib
+matplotlib.use('Pdf')
+from matplotlib import pyplot as plt
+plt.ioff()
 import optparse
 import sys
 from itertools import groupby, cycle
 from operator import itemgetter
-from matplotlib import pyplot as plt
 import numpy as np
 
 def _gen_data(fhs, columns, sep):
@@ -50,7 +47,7 @@ def manhattan(fhs, columns, image_path, no_log, colors, sep, title, lines, ymax)
     xs_by_chr = {}
 
     last_x = 0
-    data = sorted(_gen_data(fhs, columns, sep), cmp=chr_loc_cmp)
+    data = sorted(_gen_data(fhs, columns, sep), cmp=chr_loc_cmp)  # list of tuples of (chr, pos, pval)
 
     for seqid, rlist in groupby(data, key=itemgetter(0)):
         color = colors.next()
@@ -65,9 +62,9 @@ def manhattan(fhs, columns, image_path, no_log, colors, sep, title, lines, ymax)
         # keep track so that chrs don't overlap.
         last_x = xs[-1]
 
-    xs_by_chr = [(k, xs_by_chr[k]) for k in sorted(xs_by_chr.keys(), cmp=chr_cmp)]
+    xs_by_chr = [(k, xs_by_chr[k]) for k in sorted(xs_by_chr.keys(), cmp=chr_cmp)]  # tuples of (chr, pos)
 
-    xs = np.array(xs)
+    xs = np.array(xs)  # all pos
     ys = np.array(ys) if no_log else -np.log10(ys)
 
     plt.close()
@@ -89,7 +86,7 @@ def manhattan(fhs, columns, image_path, no_log, colors, sep, title, lines, ymax)
     plt.xlim(0, xs[-1])
     plt.ylim(ymin=0)
     if ymax is not None: plt.ylim(ymax=ymax)
-    plt.xticks([c[1] for c in xs_by_chr], [c[0] for c in xs_by_chr], rotation=-90, size=8.5)
+#    plt.xticks([c[1] for c in xs_by_chr], [c[0] for c in xs_by_chr], rotation=-90, size=8.5)
     print >>sys.stderr, "saving to: %s" % image_path
     plt.savefig(image_path)
     #plt.show()
@@ -108,7 +105,7 @@ def main():
     p.add_option("--colors", dest="colors", help="cycle through these colors",
                 default="bk")
     p.add_option("--image", dest="image", help="save the image to this file. e.g. %default",
-                default="manhattan.png")
+                default="manhattan.pdf")
     p.add_option("--title", help="title for the image.", default=None, dest="title")
     p.add_option("--ymax", help="max (logged) y-value for plot", dest="ymax", type='float')
     p.add_option("--sep", help="data separator, default is [tab]",
